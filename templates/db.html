@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+  {%block title%}DataBase content page{%endblock%}
+  {%block content%}
+
+    <h1> This is db.html </h1>
+    {%for user in Users%}
+      <p> user.id: {{user.id}} user.username: {{user.username}} user.password: {{user.password}}</p>
+    {% endfor %}
+    {%for l in Lists%}
+      <p> l.id: {{user.id}} l.name: {{l.name}} l.user_id {{l.user_id}}</p>
+    {% endfor %}
+    {%for i in itemList%}
+      <p> i.id: {{i.id}} i.name {{i.name}} i.list_id: {{i.list_id}}</p>
+    {% endfor %}
+  {%endblock%}

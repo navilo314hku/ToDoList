@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+  {%block title%}userListItems content page{%endblock%}
+  {%block content%}
+
+    <h1> This is userListItems of {{username}} </h1>
+    <form action="#" method="post">
+        <!--<input type='submit' value='Button Text'>-->
+        <h2> Add a new item here </h2>
+        <label>Item:</label><br>
+        <input type="txt" name="item"><br>
+        <label>list name:</label><br>
+        <input type="txt" name="list name"><br>
+        <input type='submit' value='submit'><br>
+    </form>
+    <form action="#" method="post">
+        <!--<input type='submit' value='Button Text'>-->
+        <h2> Add a new list here </h2>
+        <label>new list:</label><br>
+        <input type="txt" name="newListName"><br>
+        <input type='submit' value='submit'><br>
+    </form>
+    <h2> You have following list(s) </h3>
+    {%for list in userLists%}
+    {{list.name}} &nbsp;
+    {% endfor %}
+    {%for i in listofitems%}
+      <p>{{i.name}}</p>
+    {% endfor %}
+
+
+    {%for listname in itemsDict%}
+      <h1> {{listname}} List </h1>
+      {%for item in itemsDict[listname]%}
+        <h3> - {{item}} <h3>
+      {% endfor%}
+    {% endfor %}
+  {%endblock%}
