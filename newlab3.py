@@ -46,8 +46,14 @@ class ListItem(db.Model):
         self.name=name
         self.list_id=list_id
 class DBManipulator():
-    def printhello(self):
-        print("helloworld")
+    def getUserIDOf(self,username):
+        '''
+        1 IP: username
+        '''
+        targetUser=User.query.filter_by(username=username).first()
+        id=targetUser.id
+        print(f"id of {username} is {id}")
+        return id
 
     def addUserToDB(self,username,encryptedPw):
         newUser=User(username,encryptedPw)
@@ -63,14 +69,7 @@ class DBManipulator():
                 return True
         return False
 
-    def getUserIDOf(self,username):
-        '''
-        1 IP: username
-        '''
-        targetUser=User.query.filter_by(username=username).first()
-        id=targetUser.id
-        print(f"id of {username} is {id}")
-        return id
+
     def getListofUserByUserID(self,userID):
         targetList=List.query.filter_by(user_id=userID).all()
         return targetList
@@ -121,9 +120,6 @@ class DBManipulator():
                 print(f"there is no object in {name}")
                 items[name].append("No Item In Such List")
         return items
-        #get the
-        #return a dictionary
-        #{"Shopping":[apple,orange],"Homework":["Physics","Chemistry"]}
 
     def addNewUserItem(self,username,item,listName):
         list_id=self.getListIDByUsernameAndListName(username,listName)
@@ -141,7 +137,7 @@ class DBManipulator():
         #add the list obj to the SQLALCHEMY_DATABASE_URI
         db.session.add(newList)
         db.session.commit()
-
+    "endof DBManipulator"
 DBM=DBManipulator()
 def getUserIDOf(username):
     targetUser=User.query.filter_by(username=username).first()
@@ -194,6 +190,9 @@ def addDum():
     db.session.commit()
     return redirect(url_for("login"))
     #return render_template("db.html", Users=User.query.all())
+@app.route("/")
+def default():
+    return redirect(url_for("login"))
 @app.route("/resetDB")
 def resetDB():
     db.drop_all()#remove __tablename__
@@ -216,11 +215,14 @@ def register():
 
 @app.route("/login", methods=["POST","GET"])#default is get
 def login():
+    session["username"]=""
+    session["logged_in"]=False
     if request.method=="POST":
         username=request.form["username"]
         password=request.form["password"]
         correctPassword=DBM.checkPassword(username,password)
         if(correctPassword):
+            session["logged_in"]=True
             print("login successful")
             session["username"]=username
             items=getUserListItem(username)#[item1.name,item2.name.....]
@@ -234,22 +236,18 @@ def login():
 
 @app.route("/userList",methods=["POST","GET"])
 def userList():
+    if not session["logged_in"]:
+        return redirect(url_for("login"))
     username=session["username"]
-
     if request.method=="POST":#sending data from web to BE
         newItem=request.form["item"]
         listName=request.form["list name"]
         newList=request.form["newListName"]
-        #we have got the new list from the form
-        func.printDebug()
-        print(f"Receive newItem from FE: {newItem}")
-        #update the data base
-        #find whether the list exist for the user
-        print("Debugging for list Exist for User")
-        currentUserID=getUserIDOf(username)
-        listExist=listExistForUser(username,listName)
-        #
-        DBM.addNewUserItem(username,newItem,listName)
+        if newItem!="" and listName!="":
+            DBM.addNewUserItem(username,newItem,listName)
+        if newList!="":
+            DBM.addNewListItem(username,newList)
+
 
         return redirect(url_for("userList"))
     else:#render the page
@@ -257,7 +255,11 @@ def userList():
         UserLists=getListofUserByUserID(id)#List of listObject
         itemsDict=DBM.getItemsOfUser(username)#dictionary
         return render_template("userListItems.html",username=username,userLists=UserLists,itemsDict=itemsDict)
-
+@app.route("/logout")
+def logout():
+    session["username"]=""
+    session["logged_in"]=False
+    return redirect(url_for("login"))
 def getUserListItem(usernameFromFE):#Sally
     itemsBelongsToUser=[]
     userID=User.query.filter_by(username=usernameFromFE).first().id

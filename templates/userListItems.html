@@ -1,8 +1,9 @@
 {% extends "base.html" %}
   {%block title%}userListItems content page{%endblock%}
   {%block content%}
+  <a href= "{{url_for('logout')}}" >Logout here</a>
 
-    <h1> This is userListItems of {{username}} </h1>
+    <h1> Welcome back, {{username}} </h1>
     <form action="#" method="post">
         <!--<input type='submit' value='Button Text'>-->
         <h2> Add a new item here </h2>
@@ -11,14 +12,12 @@
         <label>list name:</label><br>
         <input type="txt" name="list name"><br>
         <input type='submit' value='submit'><br>
-    </form>
-    <form action="#" method="post">
-        <!--<input type='submit' value='Button Text'>-->
         <h2> Add a new list here </h2>
         <label>new list:</label><br>
         <input type="txt" name="newListName"><br>
         <input type='submit' value='submit'><br>
     </form>
+
     <h2> You have following list(s) </h3>
     {%for list in userLists%}
     {{list.name}} &nbsp;
